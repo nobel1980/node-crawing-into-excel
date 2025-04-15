@@ -1,0 +1,5 @@
+node_modules
+updated-devices-json.json
+devicesInfo.json
+dsn-list.xlsx
+.env

@@ -1,0 +1,12 @@
+{
+  "type": "module",
+  "scripts": {
+    "devices": "node devices.js",
+    "taxpayer": "node taxPayerList.js"
+  },
+  "dependencies": {
+    "batch-request-js": "^2.0.2",
+    "dotenv": "^16.4.7",
+    "xlsx": "^0.18.5"
+  }
+}
