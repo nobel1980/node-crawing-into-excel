@@ -2,16 +2,13 @@ import batchRequest from "batch-request-js";
 import "dotenv/config";
 import convertToExcel from "./utils/convertToExcel.js";
 import dateFormatter from "./utils/dateFormatter.js";
-import { setTimeout } from 'timers/promises';
-import https from 'https';
 import {token} from "./token.js"
 import dotenv from 'dotenv';
 dotenv.config();
 
-
 const dsnCount = async (devicesId) => {
   // const token = process.env.TOK;
-  const request1 = (id) =>
+  const request = (id) =>
     fetch(`https://efdmsapi.nbr.gov.bd/efdms/services/api/inventory/devices/${id}`, {
       method: "GET",
       headers: {
@@ -19,42 +16,10 @@ const dsnCount = async (devicesId) => {
       },
     }).then((response) => response.json());
 
-  const request2 = (id) =>
-    fetch(`https://efdmsapi.nbr.gov.bd/efdms/services/api/inventory/device-inuse/${id}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }).then((response) => response.json()); 
-
-
-    // const requests = await Promise.all(
-    //   devicesId.map(async (id) => ({
-    //     ...(await request1(id)),
-    //     deviceStatus: (await request2(id)) ? "In use" : "Not in use",
-    //   }))
-    // );
-
-    async function processLargeBatch(items, batchSize, processItem, delayMs = 1000) {
-      const results = [];
-      for (let i = 0; i < items.length; i += batchSize) {
-        const batch = items.slice(i, i + batchSize);
-        const batchResults = await Promise.all(batch.map(processItem));
-        results.push(...batchResults);
-        if (i + batchSize < items.length) await setTimeout(delayMs); // Delay between batches
-      }
-      return results;
-    }
-    
-    const requests = await processLargeBatch(devicesId, 100, async (id) => ({
-      ...(await request1(id)),
-      deviceStatus: (await request2(id)) ? "In use" : "Not in use"
-    }));
-
-    const { error, data } = await batchRequest(requests, {
-      batchSize: 500,
-      delay: 2000,   
-    });
+  const { error, data } = await batchRequest(devicesId, request, {
+    batchSize: 500,
+    delay: 2000,   
+  });
 
   const dsnLists = data.map((item) => {
     return {
@@ -69,7 +34,6 @@ const dsnCount = async (devicesId) => {
       isActivated: item.isActivated,
       isInitiated: item.isInitiated,
       isLocked: item.isLocked,
-      deviceStatus:item.deviceStatus,
       bin: item.bin,
       // outletName: item.outlet.outletNameEn || outletNameBn,
       //outLetAddress: item.outlet.addressLine1 || item.outlet.addressLine2,

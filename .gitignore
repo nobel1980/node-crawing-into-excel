@@ -1,5 +1,7 @@
 node_modules
 updated-devices-json.json
-devicesInfo.json
+progress.json
+progress - Copy.json
 dsn-list.xlsx
+.xlsx
 .env
